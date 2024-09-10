@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/style-login.css">
+    <title>CIC GYM</title>
+</head>
+<body>
+    <main id="login">
+        <aside class="login">
+            <a href="/"><img src="../static/assets/logo_cic_gym.png" alt=""></a>
+            <h2 id="tela_login">Entre em sua conta</h2>
+            <h4>Seja bem-vindo! Bom treino.</h4>
+            <form action="/login" method="POST">
+                <input type="email" placeholder="E-mail" name="email" required>
+                <input type="password" placeholder="Senha" name="senha" required>
+                <button type="submit">Entrar</button>
+                <p>Ainda não possui conta? <a href="/cadastro">Cadastre-se</a></p>    
+            </form>
+
+        </aside>
+
+        <article>
+            <img src="../static/assets/logo_cic_gym.png" alt="Treino">
+        </article>
+    </main>
+</body>
+</html>

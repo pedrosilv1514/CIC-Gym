@@ -1,0 +1,115 @@
+body{
+    height: 100vh;
+    background: linear-gradient(
+        to right,
+        white 0%,
+        white 50%,
+        black 50%,
+        black 100%
+    );
+
+    display: flex;
+    margin: 0;
+}
+
+main{
+    width: 100vw;
+    height: 90vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+aside{
+    width: 50vw;
+    height: 100vh;
+    display: flex;
+    justify-content: left;
+    align-items: left;
+    flex-direction: column;
+    padding-left: 30px;
+    padding-top: 60px;
+    line-height: 0px;
+}
+
+.tela_cadastro {
+    margin-top: 50px;
+}
+
+aside > h2{
+    margin-top: 100px;
+    padding-left: 60px;
+}
+
+
+
+aside > h3{
+    margin-top: 0px;
+    padding-left: 60px;
+    padding-bottom: 10px;
+}
+
+aside > h4{
+    margin-top: 0px;
+    margin-bottom: 60px;
+    padding-left: 60px;
+}
+form{
+    width: 60%;
+    display: flex;
+    justify-content: left;
+    align-items: left;
+    flex-direction: column;
+    padding-left: 60px;
+}
+
+form > input{
+    margin-bottom: 35px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+form > input::placeholder{
+    font-size: large;
+}
+
+form > button{
+    align-items: center;
+    color: white;
+    background-color: rgb(8, 116, 204);
+    font-size: large;
+    border: none;
+    cursor: pointer;
+}
+
+form > button:hover{
+    background-color: rgb(8, 87, 151);
+}
+
+form > p {
+    text-align: center;
+}
+
+p > a {
+    text-decoration: none;
+    color: rgb(8, 116, 204);
+}
+
+form > label{
+    margin: 0px;
+    padding-bottom: 10px;
+}
+
+article{
+    width: 50vw;
+    height: 0%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column-reverse;
+}
+
+article > img{
+    margin-top: 100px;
+}
