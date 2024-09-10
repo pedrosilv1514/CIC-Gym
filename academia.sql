@@ -1,131 +1,109 @@
--- Iniciando o banco de dados
-CREATE DATABASE IF NOT exists academia;
-USE academia;
+-- Criação do Banco de Dados
+CREATE DATABASE academia_cic;
+USE academia_cic;
 
--- Tabela Pessoa
-CREATE TABLE Pessoa (
-    idPessoa INT AUTO_INCREMENT PRIMARY KEY,
-    cpf VARCHAR(14) NOT NULL,
+-- Tabela Usuários (com foto de perfil)
+CREATE TABLE usuarios (
+    cpf VARCHAR(14) PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    dataNascimento DATE NOT NULL,
-    senha VARCHAR(255) NOT NULL
+    email VARCHAR(255) UNIQUE NOT NULL,
+    senha VARCHAR(255) NOT NULL,
+    foto_perfil BLOB,
+    data_nascimento DATE,
+    CONSTRAINT email_unique UNIQUE (email)
 );
 
--- Tabela Aluno
-CREATE TABLE Aluno (
-    idAluno INT AUTO_INCREMENT PRIMARY KEY,
-    objetivo VARCHAR(255),
-    dataMatricula DATE NOT NULL,
-    idPessoa INT,
-    FOREIGN KEY (idPessoa) REFERENCES Pessoa(idPessoa)
+-- Tabela Professores (com foto de perfil, e relacionados com Treinos)
+CREATE TABLE professores (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    senha VARCHAR(255) NOT NULL,
+    foto_perfil BLOB,
+    CONSTRAINT email_professor_unique UNIQUE (email)
 );
 
--- Tabela Professor
-CREATE TABLE Professor (
-    idProfessor INT AUTO_INCREMENT PRIMARY KEY,
-    especialidade VARCHAR(255) NOT NULL,
-    registroCREF VARCHAR(20) NOT NULL,
-    idPessoa INT,
-    FOREIGN KEY (idPessoa) REFERENCES Pessoa(idPessoa)
+-- Tabela Treinos (com relacionamento com Professor)
+CREATE TABLE treinos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    descricao TEXT NOT NULL,
+    grupo_muscular ENUM('Superiores', 'Inferiores', 'Core'),
+    professor_id INT,
+    FOREIGN KEY (professor_id) REFERENCES professores(id)
 );
 
--- Tabela Gerente
-CREATE TABLE Gerente (
-    idGerente INT AUTO_INCREMENT PRIMARY KEY,
-    cargo VARCHAR(255) NOT NULL,
-    idPessoa INT,
-    FOREIGN KEY (idPessoa) REFERENCES Pessoa(idPessoa)
+-- Tabela Exercícios (relacionados com Treinos)
+CREATE TABLE exercicios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    descricao TEXT NOT NULL,
+    repeticoes INT NOT NULL,
+    series INT NOT NULL,
+    descanso_minutos INT NOT NULL,
+    treino_id INT,
+    FOREIGN KEY (treino_id) REFERENCES treinos(id)
 );
 
--- Tabela Avaliação Física
-CREATE TABLE AvaliacaoFisica (
-    idAvaliacao INT AUTO_INCREMENT PRIMARY KEY,
-    peso DECIMAL(5,2) NOT NULL,
-    altura DECIMAL(4,2) NOT NULL,
-    imc DECIMAL(4,2) GENERATED ALWAYS AS (peso / (altura * altura)) STORED,
-    dataAvaliacao DATE NOT NULL,
-    idAluno INT,
-    FOREIGN KEY (idAluno) REFERENCES Aluno(idAluno)
+-- Tabela Avaliação Física (relacionada com Usuários)
+CREATE TABLE avaliacoes_fisicas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_cpf VARCHAR(14),
+    imc FLOAT,
+    altura DECIMAL(5, 2),
+    peso DECIMAL(5, 2),
+    data_avaliacao DATE NOT NULL,
+    FOREIGN KEY (usuario_cpf) REFERENCES usuarios(cpf) ON DELETE CASCADE
 );
 
--- Tabela Modalidade
-CREATE TABLE Modalidade (
-    idModalidade INT AUTO_INCREMENT PRIMARY KEY,
-    nomeModalidade VARCHAR(255) NOT NULL,
-    descricao TEXT,
-    tipo VARCHAR(255)
+-- Tabela Treinos Personalizados (relacionada com Usuários e Treinos)
+CREATE TABLE treinos_personalizados (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_cpf VARCHAR(14),
+    treino_id INT,
+    data_criacao DATE NOT NULL,
+    FOREIGN KEY (usuario_cpf) REFERENCES usuarios(cpf),
+    FOREIGN KEY (treino_id) REFERENCES treinos(id)
 );
 
--- Tabela Treino
-CREATE TABLE Treino (
-    idTreino INT AUTO_INCREMENT PRIMARY KEY,
-    nomeTreino VARCHAR(255) NOT NULL,
-    tipoTreino VARCHAR(255),
-    duracao TIME NOT NULL,
-    dataCriacao DATE NOT NULL,
-    idAluno INT,
-    FOREIGN KEY (idAluno) REFERENCES Aluno(idAluno),
-    idProfessor INT,
-    FOREIGN KEY (idProfessor) REFERENCES Professor(idProfessor)
+-- Tabela Categorias de Exercício
+CREATE TABLE categorias_exercicio (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    descricao TEXT
 );
 
--- Tabela Frequência
-CREATE TABLE Frequencia (
-    idFrequencia INT AUTO_INCREMENT PRIMARY KEY,
-    data DATE NOT NULL,
-    hora TIME NOT NULL,
-    presenca BOOLEAN NOT NULL,
-    idAluno INT,
-    FOREIGN KEY (idAluno) REFERENCES Aluno(idAluno)
+-- Tabela Equipamentos
+CREATE TABLE equipamentos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    descricao TEXT
 );
 
--- Tabela Exercício
-CREATE TABLE Exercicio (
-    idExercicio INT AUTO_INCREMENT PRIMARY KEY,
-    nomeExercicio VARCHAR(255) NOT NULL,
-    descricao TEXT,
-    grupoMuscular VARCHAR(255)
+-- Tabela Treino_Equipamento (Associação entre Treinos e Equipamentos)
+CREATE TABLE treino_equipamento (
+    treino_id INT,
+    equipamento_id INT,
+    PRIMARY KEY (treino_id, equipamento_id),
+    FOREIGN KEY (treino_id) REFERENCES treinos(id),
+    FOREIGN KEY (equipamento_id) REFERENCES equipamentos(id)
 );
 
--- Tabela Local
-CREATE TABLE Local (
-    idLocal INT AUTO_INCREMENT PRIMARY KEY,
-    nomeLocal VARCHAR(255) NOT NULL,
-    enderecoLocal VARCHAR(255) NOT NULL
+-- Tabela Favoritos (Relacionados com Usuários e Treinos/Exercícios)
+CREATE TABLE favoritos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_cpf VARCHAR(14),
+    treino_id INT,
+    exercicio_id INT,
+    tipo ENUM('treino', 'exercicio'),
+    FOREIGN KEY (usuario_cpf) REFERENCES usuarios(cpf),
+    FOREIGN KEY (treino_id) REFERENCES treinos(id),
+    FOREIGN KEY (exercicio_id) REFERENCES exercicios(id)
 );
 
--- Relacionamento entre Modalidade e Treino
-CREATE TABLE Modalidade_Treino (
-    idModalidade INT,
-    idTreino INT,
-    PRIMARY KEY (idModalidade, idTreino),
-    FOREIGN KEY (idModalidade) REFERENCES Modalidade(idModalidade),
-    FOREIGN KEY (idTreino) REFERENCES Treino(idTreino)
-);
+SELECT * FROM usuarios;
+SELECT * FROM professores;
 
--- Relacionamento entre Treino e Exercício
-CREATE TABLE Treino_Exercicio (
-    idTreino INT,
-    idExercicio INT,
-    PRIMARY KEY (idTreino, idExercicio),
-    FOREIGN KEY (idTreino) REFERENCES Treino(idTreino),
-    FOREIGN KEY (idExercicio) REFERENCES Exercicio(idExercicio)
-);
 
-CREATE TABLE LogAtividades (
-    idLog INT AUTO_INCREMENT PRIMARY KEY,
-    idPessoa INT,
-    acao VARCHAR(255),
-    dataHora TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (idPessoa) REFERENCES Pessoa(idPessoa)
-);
-
-CREATE TABLE HistoricoTreino (
-    idHistorico INT AUTO_INCREMENT PRIMARY KEY,
-    idAluno INT,
-    idTreino INT,
-    dataCompleto DATE NOT NULL,
-    FOREIGN KEY (idAluno) REFERENCES Aluno(idAluno),
-    FOREIGN KEY (idTreino) REFERENCES Treino(idTreino)
-);
+INSERT INTO professores (nome, email, senha, foto_perfil)
+VALUES ('Ronaldinho', 'ronaldinho@gaucho.com', 'barcelona', NULL);

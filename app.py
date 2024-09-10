@@ -14,7 +14,7 @@ app.secret_key = 'sua_chave_secreta_aqui'
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'Pe023194)' 
-app.config['MYSQL_DB'] = 'academia'
+app.config['MYSQL_DB'] = 'academia_cic'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'  # Para retornar resultados como dicionários
 
 # Configuração do caminho de upload
@@ -40,7 +40,7 @@ def criar_treino():
 def index():
     return render_template('index.html')
 
-# Rota para exibir e processar o formulário de cadastro
+# Rota para cadastro
 @app.route('/cadastro', methods=['GET', 'POST'])
 def cadastro():
     if request.method == 'GET':
@@ -51,7 +51,7 @@ def cadastro():
         nome = data.get('nome')
         cpf = data.get('cpf')
         email = data.get('email')
-        data_nascimento = data.get('dataNascimento')
+        data_nascimento = data.get('data_nascimento')
         senha = data.get('senha')
         senha2 = data.get('senha2')
 
@@ -62,19 +62,26 @@ def cadastro():
         # Criptografa a senha
         hashed_password = bcrypt.generate_password_hash(senha).decode('utf-8')
 
+        # Verifica se uma foto de perfil foi enviada
+        foto_perfil = request.files.get('foto_perfil')
+        foto_perfil_blob = None
+
+        if foto_perfil:
+            foto_perfil_blob = foto_perfil.read()
+
         try:
             cur = mysql.connection.cursor()
             cur.execute("""
-                INSERT INTO Pessoa (cpf, nome, email, dataNascimento, senha) 
-                VALUES (%s, %s, %s, %s, %s)
-            """, (cpf, nome, email, data_nascimento, hashed_password))
+                INSERT INTO usuarios (cpf, nome, email, senha, foto_perfil, data_nascimento) 
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """, (cpf, nome, email, hashed_password, foto_perfil_blob, data_nascimento))
             mysql.connection.commit()
             cur.close()
             return jsonify({'message': 'Cadastro realizado com sucesso'}), 201
         except Exception as e:
             print(e)  # Para fins de depuração
             return jsonify({'message': 'Erro no cadastro'}), 500
-
+        
 # Rota para a página de login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -88,7 +95,23 @@ def login():
 
         try:
             cur = mysql.connection.cursor()
-            cur.execute("SELECT * FROM Pessoa WHERE email = %s", [email])
+
+            # Verifica se o email pertence a um professor
+            cur.execute("SELECT * FROM professores WHERE email = %s", [email])
+            professor = cur.fetchone()
+
+            if professor:
+                # Se o email pertence a um professor, verifica a senha
+                if professor['senha'] == senha:
+                    # Salva o nome do professor na sessão
+                    session['user'] = professor['nome']
+                    session['email'] = professor['email']
+                    return render_template('professor.html', nome=professor['nome'])  # Redireciona para a página do professor
+                else:
+                    return jsonify({'message': 'Credenciais inválidas'}), 401
+
+            # Se não for um professor, verifica se é um usuário
+            cur.execute("SELECT * FROM usuarios WHERE email = %s", [email])
             user = cur.fetchone()
             cur.close()
 
@@ -104,6 +127,8 @@ def login():
         except Exception as e:
             print(e)
             return jsonify({'message': 'Erro no login'}), 500
+
+
 
 # Rota para a homepage, acessível apenas se o usuário estiver logado
 @app.route('/homepage')

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professor</title>
+    <link rel="stylesheet" href="../static/css/professor.css">
+</head>
+<body>
+    <article action='/professor'class="conteudo"></article>
+        <div class="responsivo">
+            <img src="/frontend/assets/logo_cic_gym_blue.png" alt="logo">
+            <h1>Bem-vindo {{nome}}</h1>
+            <div class="imagem-usuario">
+                <span class="icone"><i class="bi bi-person-fill"></i></span>
+            </div>
+            <section class="account">
+                <h2>Minha Conta</h2>
+                <h3>Meus Treinos</h3>
+                <div class="treinos">
+                  <div class="treino" id="treinoA" onclick="toggleDetails('detailsA')">
+                    TREINO A
+                    <div class="details" id="detailsA">
+                      <p>Nome: Treino A</p>
+                      <p>Região: Superior</p>
+                    </div>
+                  </div>
+                  <div class="treino" id="treinoB" onclick="toggleDetails('detailsB')">
+                    TREINO B
+                    <div class="details" id="detailsB">
+                      <p>Nome: Treino B</p>
+                      <p>Região: Inferior</p>
+                    </div>
+                  </div>
+                  <div class="treino" id="treinoC" onclick="toggleDetails('detailsC')">
+                    TREINO C
+                    <div class="details" id="detailsC">
+                      <p>Nome: Treino C</p>
+                      <p>Região: Superior</p>
+                    </div>
+                  </div>
+                  <div class="treino" id="treinoD" onclick="toggleDetails('detailsD')">
+                    TREINO D
+                    <div class="details" id="detailsD">
+                      <p>Nome: Treino D</p>
+                      <p>Região: Inferior</p>
+                    </div>
+                  </div>
+                </div>
+                <h3>Minhas Avaliações</h3>
+                <div class="avaliacao">
+                    <p>IMC: <strong>18.5</strong></p>
+                    <p>Resultado: <strong>BOM</strong></p>
+                </div>
+                </section>
+              </section>
+            
+
+        </div>
+  
+    </article>
+</body>
+</html>

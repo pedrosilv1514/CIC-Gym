@@ -6,5 +6,5 @@ class Config:
     MYSQL_HOST = 'localhost'
     MYSQL_USER = 'root'
     MYSQL_PASSWORD = 'Pe023194)'
-    MYSQL_DB = 'academia'
+    MYSQL_DB = 'academia_cic'
     MYSQL_CURSORCLASS = 'DictCursor'

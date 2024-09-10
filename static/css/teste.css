@@ -1,79 +1,33 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
-}
-
-.container {
-  width: 80%;
-  margin: 0 auto;
-}
-
-header {
-  text-align: center;
+/* Estilizando o fieldset e legend */
+fieldset {
+  border: 1px solid #ccc;
+  padding: 10px;
   margin-bottom: 20px;
 }
 
-.logo h1 {
-  font-size: 24px;
-  color: #007bff;
+legend {
+  font-size: 1.2em;
+  margin-bottom: 10px;
 }
 
-.account h2 {
-  font-size: 24px;
-  text-align: center;
+/* Estilizando a label principal */
+label[for="genero"] {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
 }
 
-.account h3 {
-  font-size: 18px;
-  margin-top: 20px;
+/* Estilizando o grupo de radio buttons */
+.radio-group {
+  display: flex;
+  align-items: center;
 }
 
-.treinos {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin-top: 10px;
+/* Estilizando os labels e inputs dentro do grupo */
+.radio-group label {
+  margin-right: 10px;
 }
 
-.treino {
-  background-color: #eaeaea;
-  padding: 15px;
-  text-align: center;
-  cursor: pointer;
-  border-radius: 8px;
-  transition: background-color 0.3s ease;
-}
-
-.treino:hover {
-  background-color: #ccc;
-}
-
-.details {
-  display: none;
-  margin-top: 10px;
-  background-color: #fff;
-  padding: 10px;
-  border-radius: 8px;
-}
-
-.avaliacoes {
-  margin-top: 40px;
-  text-align: center;
-}
-
-.avaliacao {
-  background-color: #eaeaea;
-  display: inline-block;
-  padding: 20px;
-  border-radius: 8px;
-}
-
-.avaliacao strong {
-  color: green;
+.radio-group input[type="radio"] {
+  margin-right: 5px;
 }
