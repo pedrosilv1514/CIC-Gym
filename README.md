@@ -29,7 +29,12 @@
 -------------
 
 <h2>Modelo Entidade Relacionamento</h2>
-<img alt="modelo-entidade-relacionamento" src="Modelo Entidade Relacionamento.jpg">
+<img alt="modelo-entidade-relacionamento" src="static/assets/Modelo Entidade Relacionamento.png">
+
+------------
+
+<h2>Modelo Relacional</h2>
+<img alt="modelo-entidade-relacionamento" src="static/assets/modelo_relacional.png">
 
 ------------
 
