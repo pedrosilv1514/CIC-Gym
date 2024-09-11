@@ -13,7 +13,6 @@
             <div class="expansor">
                 <i class="bi bi-list" id="expandir"></i>
             </div>
-
             <ul>
                 <li class="item-menu ativo">
                     <a href="/homepage">
@@ -49,18 +48,18 @@
             <img src="../static/assets/logo_cic_gym_blue.png" alt="logo">
             <h1>Conta</h1>
             <div class="imagem-usuario">
-                <span><i class="bi bi-person-fill"></i></span>  
-            </div>
+                <img src="{{ url_for('foto_perfil', cpf=usuario.cpf) }}" alt="Foto de perfil" style="width: 100px; height: 100px;">
+            </div>        
 
             <form action="/conta" method="POST" enctype="multipart/form-data">
-                <label for="input">Selecionar foto de perfil:</label>
+                <label for="imagem-perfil">Selecionar foto de perfil:</label>
                 <input type="file" name="perfil" id="imagem-perfil" accept="image/*"><br>
 
-                <label for="input">Adicionar novo E-mail:</label>
-                <input type="email" name="email" id="email"><br>
+                <label for="email">Adicionar novo E-mail:</label>
+                <input type="email" name="email" id="email" value="{{ usuario.email }}" required><br>
 
-                <label for="input">Telefone:</label>
-                <input type="text" name="telefone" id="telefone"><br>
+                <label for="senha">Nova Senha:</label>
+                <input type="password" name="senha" id="senha"><br>
 
                 <button type="submit">Atualizar Conta</button>
             </form>

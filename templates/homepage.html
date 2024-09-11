@@ -6,7 +6,49 @@
     <title>CIC GYM</title>
     <link rel="stylesheet" href="../static/css/homestyle.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .galeria-treinos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .treino {
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            width: calc(25% - 16px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+        }
+        .treino h4 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+        .treino button {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: #e74c3c;
+            border: none;
+            color: white;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .treino button:hover {
+            background-color: #c0392b;
+        }
 
+        .imagem-usuario img {
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border: 2px solid #ddd;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -14,7 +56,6 @@
             <div class="expansor">
                 <i class="bi bi-list" id="expandir"></i>
             </div>
-
             <ul>
                 <li class="item-menu ativo">
                     <a href="/homepage">
@@ -23,18 +64,17 @@
                     </a>
                 </li>
                 <li class="item-menu">
-                    <a href="treino.html">
+                    <a href="/treino">
                         <span class="icone"><i class="bi bi-trophy-fill"></i></span>
                         <span class="txt">Treino</span>
                     </a>
                 </li>
                 <li class="item-menu">
-                    <a href="avaliacao.html">
+                    <a href="/avaliacao">
                         <span class="icone"><i class="bi bi-calendar3"></i></span>
                         <span class="txt">Avaliação</span>
                     </a>
                 </li>
-                
                 <li class="item-menu">
                     <a href="/conta">
                         <span class="icone"><i class="bi bi-person-circle"></i></span>
@@ -51,110 +91,122 @@
             <img src="/frontend/assets/logo_cic_gym_blue.png" alt="logo">
             <h1>Bem-vindo {{nome}}</h1>
             <div class="imagem-usuario">
-                <span class="icone"><i class="bi bi-person-fill"></i></span>
+                <!--<span class="icone"><i class="bi bi-person-fill"></i></span>-->
+                <img src="{{ url_for('foto_perfil', cpf=usuario.cpf) }}" alt="Foto de perfil" style="width: 100px; height: 100px;">
             </div>
             <section class="account">
                 <h2>Minha Conta</h2>
-                <h3>Meus Treinos</h3>
-                <div class="treinos">
-                  <div class="treino" id="treinoA" onclick="toggleDetails('detailsA')">
-                    TREINO A
-                    <div class="details" id="detailsA">
-                      <p>Nome: Treino A</p>
-                      <p>Região: Superior</p>
-                    </div>
-                  </div>
-                  <div class="treino" id="treinoB" onclick="toggleDetails('detailsB')">
-                    TREINO B
-                    <div class="details" id="detailsB">
-                      <p>Nome: Treino B</p>
-                      <p>Região: Inferior</p>
-                    </div>
-                  </div>
-                  <div class="treino" id="treinoC" onclick="toggleDetails('detailsC')">
-                    TREINO C
-                    <div class="details" id="detailsC">
-                      <p>Nome: Treino C</p>
-                      <p>Região: Superior</p>
-                    </div>
-                  </div>
-                  <div class="treino" id="treinoD" onclick="toggleDetails('detailsD')">
-                    TREINO D
-                    <div class="details" id="detailsD">
-                      <p>Nome: Treino D</p>
-                      <p>Região: Inferior</p>
-                    </div>
-                  </div>
+                <h3>Meus Favoritos</h3>
+                <div class="galeria-treinos" id="favoritos-container">
+                    <!-- Treinos e exercícios favoritos serão carregados dinamicamente aqui -->
                 </div>
                 <h3>Minhas Avaliações</h3>
                 <div class="avaliacao">
                     <p>IMC: <strong>18.5</strong></p>
                     <p>Resultado: <strong>BOM</strong></p>
                 </div>
-                </section>
-              </section>
-            
-
+            </section>
         </div>
-  
     </article>
 
     <script>
-        var menuItem = document.querySelectorAll('.item-menu')
+        // Função para atualizar o menu
+        var menuItem = document.querySelectorAll('.item-menu');
 
-        function selectLink(){
-            menuItem.forEach((item)=> 
-                item.classList.remove('ativo')
-            )
-            this.classList.add('ativo')
+        function selectLink() {
+            menuItem.forEach((item) => item.classList.remove('ativo'));
+            this.classList.add('ativo');
         }
 
-        menuItem.forEach((item)=>
-            item.addEventListener('click', selectLink)
-        )
+        menuItem.forEach((item) => item.addEventListener('click', selectLink));
 
-        //Expandir o menu
-        var expandir = document.querySelector('#expandir')
-        var menu_expandido = document.querySelector('.menu-burguer')
+        var expandir = document.querySelector('#expandir');
+        var menu_expandido = document.querySelector('.menu-burguer');
 
-        expandir.addEventListener('click', function(){
-            menu_expandido.classList.toggle('expandir')
-        })
+        expandir.addEventListener('click', function() {
+            menu_expandido.classList.toggle('expandir');
+        });
 
-        let treinosSelecionados = [];
+        //Função para carregar imagem do usuário
+        document.addEventListener('DOMContentLoaded', function() {
+            // Obtém o CPF do usuário de alguma forma, por exemplo, a partir de uma variável de sessão ou API
+            const cpf = '{{ usuario_cpf }}'; // Substitua isso pela maneira como você obtém o CPF no seu código
 
-        // Função para adicionar treino à lista de selecionados
-        function selecionarTreino(idTreino) {
-            if (!treinosSelecionados.includes(idTreino)) {
-                treinosSelecionados.push(idTreino);
-                console.log("Treinos selecionados: ", treinosSelecionados);
-            }
+            // Carregar a foto do perfil
+            fetch(`/api/usuario/${cpf}/foto`)
+                .then(response => {
+                    if (response.ok) {
+                        return response.blob();
+                    } else {
+                        throw new Error('Foto não encontrada');
+                    }
+                })
+                .then(blob => {
+                    const img = document.getElementById('foto-perfil');
+                    img.src = URL.createObjectURL(blob);
+                })
+                .catch(error => console.error('Erro ao carregar foto:', error));
+
+            // Carregar os favoritos
+            fetch(`/api/favoritos/${cpf}`)
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('favoritos-container');
+                    container.innerHTML = ''; // Limpa o container antes de adicionar novos itens
+
+                    data.forEach((item) => {
+                        const itemElement = document.createElement('div');
+                        itemElement.className = 'treino';
+                        itemElement.id = `item-${item.id}`;
+                        let tipoDescricao = item.tipo === 'treino' ? 'Treino' : 'Exercício';
+                        itemElement.innerHTML = `
+                            <h4>${item.nome}</h4>
+                            <p><strong>Tipo:</strong> ${tipoDescricao}</p>
+                            <button onclick="removerFavorito(${item.id})">Remover</button>
+                        `;
+                        container.appendChild(itemElement);
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar favoritos:', error));
+        });
+
+
+        function carregarFavoritos() {
+            fetch('/api/favoritos')
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('favoritos-container');
+                    container.innerHTML = ''; // Limpa o container antes de adicionar novos itens
+
+                    data.forEach((item) => {
+                        const itemElement = document.createElement('div');
+                        itemElement.className = 'treino';
+                        itemElement.id = `item-${item.id}`;
+                        let tipoDescricao = item.tipo === 'treino' ? 'Treino' : 'Exercício';
+                        itemElement.innerHTML = `
+                            <h4>${item.nome}</h4>
+                            <p><strong>Tipo:</strong> ${tipoDescricao}</p>
+                            <button onclick="removerFavorito(${item.id})">Remover</button>
+                        `;
+                        container.appendChild(itemElement);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
         }
 
-        // Função para enviar o treino personalizado para o backend Flask
-        document.getElementById('criar-treino').addEventListener('click', function() {
-            fetch('/criar-treino', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ treinos: treinosSelecionados })
+        function removerFavorito(idFavorito) {
+            fetch(`/api/favoritos/${idFavorito}`, {
+                method: 'DELETE',
             })
             .then(response => response.json())
             .then(data => {
-                console.log("Treino personalizado criado:", data);
-            });
-        });
-        function toggleDetails(detailsId) {
-            const details = document.getElementById(detailsId);
-            if (details.style.display === "block") {
-                details.style.display = "none";
-            } else {
-                details.style.display = "block";
-            }
+                console.log("Favorito removido:", data);
+                carregarFavoritos(); // Atualiza a lista de favoritos
+            })
+            .catch(error => console.error('Error:', error));
         }
 
-
+        document.addEventListener('DOMContentLoaded', carregarFavoritos);
     </script>
 </body>
 </html>

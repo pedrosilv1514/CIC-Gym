@@ -1,33 +1,33 @@
-/* Estilizando o fieldset e legend */
-fieldset {
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin-bottom: 20px;
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
 }
 
-legend {
-  font-size: 1.2em;
-  margin-bottom: 10px;
+h1, h2 {
+  text-align: center;
+  color: #333;
 }
 
-/* Estilizando a label principal */
-label[for="genero"] {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-/* Estilizando o grupo de radio buttons */
-.radio-group {
+.treinos {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-around;
 }
 
-/* Estilizando os labels e inputs dentro do grupo */
-.radio-group label {
-  margin-right: 10px;
+.treino-bloco {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  width: 30%;
+  margin: 10px;
+  background-color: #f9f9f9;
 }
 
-.radio-group input[type="radio"] {
-  margin-right: 5px;
+.treino-bloco h3 {
+  color: #007BFF;
+}
+
+.treino-bloco p {
+  margin: 5px 0;
 }

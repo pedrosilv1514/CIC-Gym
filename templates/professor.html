@@ -3,61 +3,366 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professor</title>
-    <link rel="stylesheet" href="../static/css/professor.css">
+    <title>Treinos</title>
+    <!-- FontAwesome para os ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .user-icon {
+            font-size: 40px;
+            color: #007bff;
+        }
+
+        .selects {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        select {
+            padding: 5px;
+            font-size: 16px;
+        }
+
+        /* Estilizando os cards de treino */
+        .treino-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #e0e0e0;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .treino-card strong {
+            font-size: 18px;
+        }
+
+        /* Detalhes ocultos inicialmente */
+        .treino-details {
+            display: none;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        /* Botão de adicionar treino */
+        .add-btn {
+            background-color: #007bff;
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .add-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Estilos para pop-ups */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .popup-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            position: relative;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .popup-content h2 {
+            margin-top: 0;
+        }
+
+        .popup .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .exercise-list {
+            margin-top: 20px;
+        }
+
+        .exercise-card {
+            background-color: #e0e0e0;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
 </head>
 <body>
-    <article action='/professor'class="conteudo"></article>
-        <div class="responsivo">
-            <img src="/frontend/assets/logo_cic_gym_blue.png" alt="logo">
-            <h1>Bem-vindo {{nome}}</h1>
-            <div class="imagem-usuario">
-                <span class="icone"><i class="bi bi-person-fill"></i></span>
-            </div>
-            <section class="account">
-                <h2>Minha Conta</h2>
-                <h3>Meus Treinos</h3>
-                <div class="treinos">
-                  <div class="treino" id="treinoA" onclick="toggleDetails('detailsA')">
-                    TREINO A
-                    <div class="details" id="detailsA">
-                      <p>Nome: Treino A</p>
-                      <p>Região: Superior</p>
-                    </div>
-                  </div>
-                  <div class="treino" id="treinoB" onclick="toggleDetails('detailsB')">
-                    TREINO B
-                    <div class="details" id="detailsB">
-                      <p>Nome: Treino B</p>
-                      <p>Região: Inferior</p>
-                    </div>
-                  </div>
-                  <div class="treino" id="treinoC" onclick="toggleDetails('detailsC')">
-                    TREINO C
-                    <div class="details" id="detailsC">
-                      <p>Nome: Treino C</p>
-                      <p>Região: Superior</p>
-                    </div>
-                  </div>
-                  <div class="treino" id="treinoD" onclick="toggleDetails('detailsD')">
-                    TREINO D
-                    <div class="details" id="detailsD">
-                      <p>Nome: Treino D</p>
-                      <p>Região: Inferior</p>
-                    </div>
-                  </div>
-                </div>
-                <h3>Minhas Avaliações</h3>
-                <div class="avaliacao">
-                    <p>IMC: <strong>18.5</strong></p>
-                    <p>Resultado: <strong>BOM</strong></p>
-                </div>
-                </section>
-              </section>
-            
+    <div class="container">
+        <div class="header">
+            <i class="fas fa-user-circle user-icon"></i>
+            <button id="create-treino-btn" class="add-btn"><i class="fas fa-plus"></i> Criar um Treino</button>
+            <button id="create-exercicio-btn" class="add-btn"><i class="fas fa-plus"></i> Criar Exercício</button>
+            <!-- Seletor de Treinos e Grupo Muscular -->
+            <div class="selects">
+                <!-- Seletor existente -->
+                <label for="modalidades">Treinos:</label>
+                <select name="modalidades" id="modalidades">
+                    <option value="Treinos">Treinos</option>
+                    <option value="Personalizado">Personalizado</option>
+                    <option value="Diversos">Diversos</option>
+                </select>
 
+                <label for="grupo">Grupo Muscular:</label>
+                <select name="grupo" id="grupo">
+                    <option value="Superiores">Superiores</option>
+                    <option value="Inferiores">Inferiores</option>
+                </select>
+            </div>
         </div>
-  
-    </article>
+
+        <div class="treinos" id="treinos-container">
+            <!-- Treinos serão gerados dinamicamente -->
+        </div>
+
+        <!-- Pop-up para criar treino -->
+        <div id="create-treino-popup" class="popup">
+            <div class="popup-content">
+                <span class="close-btn" onclick="closePopup('create-treino-popup')">&times;</span>
+                <h2>Criar Novo Treino</h2>
+                <label for="treino-nome">Nome:</label>
+                <input type="text" id="treino-nome">
+                <label for="treino-descricao">Descrição:</label>
+                <textarea id="treino-descricao"></textarea>
+                <label for="treino-grupo">Grupo Muscular:</label>
+                <select id="treino-grupo">
+                    <option value="Superiores">Superiores</option>
+                    <option value="Inferiores">Inferiores</option>
+                    <option value="Core">Core</option>
+                </select>
+                <button onclick="createTreino()">Salvar</button>
+            </div>
+        </div>
+
+        <!-- Pop-up para criar exercício -->
+        <div id="create-exercicio-popup" class="popup">
+            <div class="popup-content">
+                <span class="close-btn" onclick="closePopup('create-exercicio-popup')">&times;</span>
+                <h2>Criar Novo Exercício</h2>
+                <label for="exercicio-nome">Nome:</label>
+                <input type="text" id="exercicio-nome" required>
+                <label for="exercicio-descricao">Descrição:</label>
+                <textarea id="exercicio-descricao" required></textarea>
+                <label for="exercicio-repeticoes">Repetições:</label>
+                <input type="number" id="exercicio-repeticoes" required>
+                <label for="exercicio-series">Séries:</label>
+                <input type="number" id="exercicio-series" required>
+                <label for="exercicio-descanso">Descanso (min):</label>
+                <input type="number" id="exercicio-descanso" required>
+                <label for="exercicio-treino">Treino:</label>
+                <select id="exercicio-treino" required></select>
+                <button onclick="createExercicio()">Salvar</button>
+                <button onclick="closePopup('create-exercicio-popup')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('create-treino-btn').addEventListener('click', () => openPopup('create-treino-popup'));
+        document.getElementById('create-exercicio-btn').addEventListener('click', () => {
+            openPopup('create-exercicio-popup');
+            loadTreinosForExercise(); // Carregar treinos para o seletor
+        });
+
+        function openPopup(popupId) {
+            document.getElementById(popupId).style.display = 'flex';
+        }
+
+        function closePopup(popupId) {
+            document.getElementById(popupId).style.display = 'none';
+        }
+
+        function createTreino() {
+            const nome = document.getElementById('treino-nome').value;
+            const descricao = document.getElementById('treino-descricao').value;
+            const grupo = document.getElementById('treino-grupo').value;
+
+            fetch('/api/treinos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ nome, descricao, grupo })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Treino criado com sucesso!');
+                closePopup('create-treino-popup');
+                loadTreinos(); // Atualizar a lista de treinos após a criação
+            })
+            .catch(error => console.error('Erro:', error));
+        }
+
+        function createExercicio() {
+            const nome = document.getElementById('exercicio-nome').value;
+            const descricao = document.getElementById('exercicio-descricao').value;
+            const repeticoes = document.getElementById('exercicio-repeticoes').value;
+            const series = document.getElementById('exercicio-series').value;
+            const descanso = document.getElementById('exercicio-descanso').value;
+            const treinoId = document.getElementById('exercicio-treino').value;
+
+            fetch('/api/exercicios', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ nome, descricao, repeticoes, series, descanso, treinoId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Exercício criado com sucesso!');
+                closePopup('create-exercicio-popup');
+                loadTreinos(); // Atualizar a lista de treinos após a criação
+            })
+            .catch(error => console.error('Erro:', error));
+        }
+
+        function loadTreinosForExercise() {
+            fetch('/api/treinos')
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById('exercicio-treino');
+                select.innerHTML = ''; // Limpa o seletor antes de adicionar novas opções
+                data.forEach(treino => {
+                    const option = document.createElement('option');
+                    option.value = treino.id;
+                    option.textContent = `${treino.nome} (ID: ${treino.id})`;
+                    select.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Erro:', error));
+        }
+
+        function loadTreinos() {
+            fetch('/api/treinos')
+            .then(response => response.json())
+            .then(treinos => {
+                const container = document.getElementById('treinos-container');
+                container.innerHTML = ''; // Limpa o conteúdo antes de adicionar novos treinos
+                treinos.forEach(treino => {
+                    // Cria o card do treino
+                    const treinoCard = document.createElement('div');
+                    treinoCard.className = 'treino-card';
+                    treinoCard.innerHTML = `
+                        <strong>${treino.nome}</strong>
+                        <button onclick="toggleDetails(${treino.id})">Ver Exercícios</button>
+                        <button class="delete-btn" onclick="deleteTreino(${treino.id})">Excluir</button>
+                        <div id="treino-details-${treino.id}" class="treino-details"></div>
+                    `;
+                    container.appendChild(treinoCard);
+                    
+                    // Carrega os exercícios associados ao treino
+                    loadExercicios(treino.id);
+                });
+            })
+            .catch(error => console.error('Erro:', error));
+        }
+
+        function loadExercicios(treinoId) {
+            fetch(`/api/exercicios?treino_id=${treinoId}`)
+            .then(response => response.json())
+            .then(exercicios => {
+                const detailsContainer = document.getElementById(`treino-details-${treinoId}`);
+                detailsContainer.innerHTML = ''; // Limpa o conteúdo antes de adicionar novos exercícios
+                exercicios.forEach(exercicio => {
+                    const exercicioCard = document.createElement('div');
+                    exercicioCard.className = 'exercise-card';
+                    exercicioCard.innerHTML = `
+                        <strong>${exercicio.nome}</strong>
+                        <p>${exercicio.descricao}</p>
+                        <p>Repetições: ${exercicio.repeticoes}</p>
+                        <p>Séries: ${exercicio.series}</p>
+                        <p>Descanso: ${exercicio.descanso} min</p>
+                    `;
+                    detailsContainer.appendChild(exercicioCard);
+                });
+            })
+            .catch(error => console.error('Erro:', error));
+        }
+
+        function toggleDetails(treinoId) {
+            const detailsContainer = document.getElementById(`treino-details-${treinoId}`);
+            if (detailsContainer.style.display === 'none' || detailsContainer.style.display === '') {
+                detailsContainer.style.display = 'block';
+            } else {
+                detailsContainer.style.display = 'none';
+            }
+        }
+
+        function deleteTreino(treinoId) {
+            if (confirm('Tem certeza de que deseja excluir este treino?')) {
+                fetch(`/api/treinos/${treinoId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Treino excluído com sucesso!');
+                    loadTreinos(); // Atualizar a lista de treinos após a exclusão
+                })
+                .catch(error => console.error('Erro:', error));
+            }
+        }
+
+        // Carregar treinos na inicialização da página
+        loadTreinos();
+    </script>
 </body>
 </html>

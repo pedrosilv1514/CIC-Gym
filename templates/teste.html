@@ -1,23 +1,311 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Radio Button de Gênero</title>
-    <link rel="stylesheet" href="../static/css/teste.css">
+    <title>Treinos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .user-icon {
+            font-size: 40px;
+            color: #007bff;
+        }
+
+        .selects {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        select {
+            padding: 5px;
+            font-size: 16px;
+        }
+
+        /* Estilizando os cards de treino */
+        .treino-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #e0e0e0;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .treino-card strong {
+            font-size: 18px;
+        }
+
+        /* Detalhes ocultos inicialmente */
+        .treino-details {
+            display: none;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        /* Botão de adicionar treino */
+        .add-btn {
+            background-color: #007bff;
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .add-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Estilizando os cards de exercício */
+        .exercicio-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #e0e0e0;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .exercicio-card strong {
+            font-size: 16px;
+        }
+
+        .exercicio-card button {
+            background-color: #007bff;
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .exercicio-card button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <form>
-        <fieldset>
-            <legend>Selecione seu gênero:</legend>
-            <label for="genero">Gênero</label>
-            <div class="radio-group">
-                <label for="masculino">Masculino</label>
-                <input type="radio" id="masculino" name="genero" value="M">
-                <label for="feminino">Feminino</label>
-                <input type="radio" id="feminino" name="genero" value="F">
+    <div class="container">
+        <div class="header">
+            <i class="fas fa-user-circle user-icon"></i>
+            <div class="selects">
+                <label for="modalidades">Treinos:</label>
+                <select name="modalidades" id="modalidades">
+                    <option value="Treinos">Treinos</option>
+                    <option value="Personalizado">Personalizado</option>
+                    <option value="Diversos">Diversos</option>
+                </select>                        
+                <label for="grupo">Grupo Muscular:</label>
+                <select name="grupo" id="grupo">
+                    <option value="Superiores">Superiores</option>
+                    <option value="Inferiores">Inferiores</option>
+                </select>
             </div>
-        </fieldset>
-    </form>
+        </div>
+
+        <div class="treinos" id="treinos-container">
+            <!-- Treinos serão gerados dinamicamente -->
+        </div>
+    </div>
+
+    <script>
+        function toggleDetails(detailsId) {
+            const detailsElement = document.getElementById(detailsId);
+            if (detailsElement.style.display === "none") {
+                detailsElement.style.display = "block";
+            } else {
+                detailsElement.style.display = "none";
+            }
+        }
+
+        function loadTreinos() {
+            const modalidades = document.getElementById('modalidades').value;
+            const grupo = document.getElementById('grupo').value;
+            const container = document.getElementById('treinos-container');
+            container.innerHTML = ''; // Limpa o container antes de adicionar novos treinos
+
+            if (modalidades === "Treinos") {
+                fetch(`/api/treinos/${grupo}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach((treino, index) => {
+                            const treinoId = `treino${index}`;
+                            const detailsId = `details${index}`;
+
+                            const treinoElement = document.createElement('div');
+                            treinoElement.className = 'treino-card';
+                            treinoElement.id = treinoId;
+                            treinoElement.onclick = () => toggleDetails(detailsId);
+                            treinoElement.innerHTML = `
+                                <strong>${treino.nome}</strong>
+                                <button class="add-btn" onclick="addToPersonalizado(${treino.id})"><i class="fas fa-plus"></i></button>
+                            `;
+
+                            const detailsElement = document.createElement('div');
+                            detailsElement.className = 'treino-details';
+                            detailsElement.id = detailsId;
+                            detailsElement.style.display = 'none';  // Ocultar por padrão
+                            detailsElement.innerHTML = `
+                                <p><strong>Nome:</strong> ${treino.nome}</p>
+                                <p><strong>Região:</strong> ${treino.grupo_muscular}</p>
+                                <div id="exercicios-${index}"></div> <!-- Exercícios serão carregados aqui -->
+                            `;
+
+                            container.appendChild(treinoElement);
+                            container.appendChild(detailsElement);
+
+                            // Carregar os exercícios para este treino
+                            loadExercicios(treino.id, `exercicios-${index}`);
+                        });
+                    })
+                    .catch(error => console.error('Error:', error));
+            } else if (modalidades === "Diversos") {
+                loadExerciciosDiversos();
+            } else {
+                document.getElementById('treinos-container').innerHTML = '';
+            }
+        }
+
+        function loadExerciciosDiversos() {
+            fetch(`/api/exercicios/diversos`)
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('treinos-container');
+                    container.innerHTML = ''; // Limpa o container antes de adicionar novos exercícios
+
+                    data.forEach((exercicio, index) => {
+                        const exercicioId = `exercicio${index}`;
+
+                        const exercicioElement = document.createElement('div');
+                        exercicioElement.className = 'exercicio-card';
+                        exercicioElement.id = exercicioId;
+                        exercicioElement.innerHTML = `
+                            <strong>${exercicio.nome}</strong>
+                            <button class="add-btn"><i class="fas fa-plus"></i></button>
+                        `;
+
+                        const detailsElement = document.createElement('div');
+                        detailsElement.className = 'exercicio-details';
+                        detailsElement.id = `details-${index}`;
+                        detailsElement.style.display = 'none';  // Ocultar por padrão
+                        detailsElement.innerHTML = `
+                            <p><strong>Descrição:</strong> ${exercicio.descricao}</p>
+                            <p><strong>Séries:</strong> ${exercicio.series}</p>
+                            <p><strong>Repetições:</strong> ${exercicio.repeticoes}</p>
+                            <p><strong>Descanso (min):</strong> ${exercicio.descanso_minutos}</p>
+                        `;
+
+                        container.appendChild(exercicioElement);
+                        container.appendChild(detailsElement);
+
+                        // Opcional: Adicione funcionalidade para mostrar detalhes ao clicar no exercício
+                        exercicioElement.onclick = () => toggleDetails(`details-${index}`);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function loadExercicios(treinoId, containerId) {
+            fetch(`/api/treino/${treinoId}/exercicios`)
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById(containerId);
+                    container.innerHTML = ''; // Limpa o container antes de adicionar novos exercícios
+
+                    data.forEach(exercicio => {
+                        const exercicioElement = document.createElement('div');
+                        exercicioElement.innerHTML = `
+                            <p><strong>Nome:</strong> ${exercicio.nome}</p>
+                            <p><strong>Séries:</strong> ${exercicio.series}</p>
+                            <p><strong>Repetições:</strong> ${exercicio.repeticoes}</p>
+                        `;
+                        container.appendChild(exercicioElement);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function addToPersonalizado(treinoId) {
+            // Aqui você pode enviar o treinoId e o usuárioCPF para o back-end
+            const usuarioCPF = 'user-cpf'; // Substitua pelo CPF real do usuário
+
+            fetch('/api/treinos-personalizados', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    usuario_cpf: usuarioCPF,
+                    treino_id: treinoId,
+                    data_criacao: new Date().toISOString().split('T')[0] // Data no formato YYYY-MM-DD
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Treino adicionado ao personalizado com sucesso!');
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        document.addEventListener('DOMContentLoaded', loadTreinos);
+        document.getElementById('modalidades').addEventListener('change', loadTreinos);
+        document.getElementById('grupo').addEventListener('change', loadTreinos);
+        
+        function updateHomepage() {
+            fetch('/api/treinos-personalizados')
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('personalizados-container');
+                    container.innerHTML = ''; // Limpa o container antes de adicionar novos treinos
+
+                    data.forEach(treino => {
+                        const treinoElement = document.createElement('div');
+                        treinoElement.className = 'treino-card';
+                        treinoElement.innerHTML = `
+                            <strong>${treino.nome}</strong>
+                            <p><strong>Região:</strong> ${treino.regiao}</p>
+                        `;
+                        container.appendChild(treinoElement);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
 </body>
 </html>
