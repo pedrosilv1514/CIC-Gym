@@ -360,64 +360,66 @@ def delete_favorito(favorito_id):
         print(e)
         return jsonify({'message': 'Erro ao remover favorito'}), 500
 
-@app.route('/conta', methods=['GET'])
+
+@app.route('/conta', methods=['GET', 'POST'])
 def conta():
     if 'cpf' not in session:
-        return redirect(url_for('login'))  # Redirecionar se não estiver autenticado
-
-    cpf = session['cpf']
-    cur = mysql.connection.cursor()
-    cur.execute("""
-        SELECT * FROM usuarios
-        WHERE cpf = %s
-    """, (cpf,))
-    usuario = cur.fetchone()
-    cur.close()
-
-    return render_template('conta.html', usuario=usuario)
-
-
-@app.route('/conta', methods=['POST'])
-def atualizar_conta():
-    if 'cpf' not in session:
         return redirect(url_for('login'))
-
+    
     cpf = session['cpf']
-    foto_perfil = request.files.get('perfil')
-    novo_email = request.form.get('email')
-    senha = request.form.get('senha')
+    
+    if request.method == 'POST':
+        # Processa o envio do formulário
+        email = request.form.get('email')
+        senha = request.form.get('senha')
+        foto_perfil = request.files.get('perfil')
+        
+        if foto_perfil:
+            foto_perfil_bytes = foto_perfil.read()
 
-    cur = mysql.connection.cursor()
+            cur = mysql.connection.cursor()
+            cur.execute("""
+                UPDATE usuarios
+                SET foto_perfil = %s
+                WHERE cpf = %s
+            """, (foto_perfil_bytes, cpf))
+            mysql.connection.commit()
+            cur.close()
 
-    if foto_perfil:
-        filename = secure_filename(foto_perfil.filename)
-        foto_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        foto_perfil.save(foto_path)
-        cur.execute("""
-            UPDATE usuarios
-            SET foto_perfil = %s, email = %s
-            WHERE cpf = %s
-        """, (filename, novo_email, cpf))
+        if email:
+            cur = mysql.connection.cursor()
+            cur.execute("""
+                UPDATE usuarios
+                SET email = %s
+                WHERE cpf = %s
+            """, (email, cpf))
+            mysql.connection.commit()
+            cur.close()
+
+        if senha:
+            senha_hash = bcrypt.generate_password_hash(senha).decode('utf-8')
+            cur = mysql.connection.cursor()
+            cur.execute("""
+                UPDATE usuarios
+                SET senha = %s
+                WHERE cpf = %s
+            """, (senha_hash, cpf))
+            mysql.connection.commit()
+            cur.close()
+        
+        return redirect(url_for('conta') + '?atualizada=true')
+
     else:
-        cur.execute("""
-            UPDATE usuarios
-            SET email = %s
-            WHERE cpf = %s
-        """, (novo_email, cpf))
+        # Método GET: Exibe o formulário com dados atuais
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT email, foto_perfil FROM usuarios WHERE cpf = %s", (cpf,))
+        usuario = cur.fetchone()
+        cur.close()
+        return render_template('conta.html', usuario=usuario)
 
-    if senha:
-        hashed_senha = bcrypt.generate_password_hash(senha).decode('utf-8')
-        cur.execute("""
-            UPDATE usuarios
-            SET senha = %s
-            WHERE cpf = %s
-        """, (hashed_senha, cpf))
 
-    mysql.connection.commit()
-    cur.close()
 
-    return redirect(url_for('homepage'))
-
+'''
 @app.route('/api/usuario/<cpf>/foto', methods=['GET'])
 def get_foto_perfil(cpf):
     # Consulta para buscar a imagem no banco de dados
@@ -433,6 +435,21 @@ def get_foto_perfil(cpf):
     else:
         # Se não houver imagem, retornar uma imagem padrão ou erro
         return jsonify({'message': 'Foto não encontrada'}), 404
+
+@app.route('/api/usuario/<cpf>/foto', methods=['GET'])
+def get_foto_perfil(cpf):
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    query = "SELECT foto FROM usuarios WHERE cpf = %s"
+    cursor.execute(query, (cpf,))
+    foto_blob = cursor.fetchone()[0]
+    connection.close()
+
+    if foto_blob:
+        return Response(foto_blob, mimetype='image/jpeg')  # ajuste o mimetype se necessário
+    else:
+        return "Imagem não encontrada", 404
+
 
 @app.route('/foto_perfil/<cpf>')
 def foto_perfil(cpf):
@@ -452,6 +469,24 @@ def foto_perfil(cpf):
     except Exception as e:
         print(e)
         abort(500, description="Erro ao carregar a imagem")
+
+'''
+
+@app.route('/foto_perfil/<cpf>')
+def foto_perfil(cpf):
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT foto_perfil, tipo_imagem FROM usuarios WHERE cpf = %s", (cpf,))
+    usuario = cur.fetchone()
+    cur.close()
+
+    if usuario and usuario['foto_perfil']:
+        return send_file(
+            BytesIO(usuario['foto_perfil']),
+            mimetype=usuario['tipo_imagem'],
+            as_attachment=False
+        )
+    else:
+        return abort(404)
 
 
 # Rota para logout

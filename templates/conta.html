@@ -48,25 +48,33 @@
             <img src="../static/assets/logo_cic_gym_blue.png" alt="logo">
             <h1>Conta</h1>
             <div class="imagem-usuario">
-                <img src="{{ url_for('foto_perfil', cpf=usuario.cpf) }}" alt="Foto de perfil" style="width: 100px; height: 100px;">
+                <img src="{{ url_for('foto_perfil', cpf=usuario['cpf']) }}" alt="Foto de perfil" style="width: 100px; height: 100px;">
             </div>        
 
             <form action="/conta" method="POST" enctype="multipart/form-data">
                 <label for="imagem-perfil">Selecionar foto de perfil:</label>
                 <input type="file" name="perfil" id="imagem-perfil" accept="image/*"><br>
 
-                <label for="email">Adicionar novo E-mail:</label>
-                <input type="email" name="email" id="email" value="{{ usuario.email }}" required><br>
+                <label for="email">Adicionar novo E-Mail:</label>
+                <input type="email" name="email" id="email" value="{{ usuario['email'] }}" required><br>
 
                 <label for="senha">Nova Senha:</label>
                 <input type="password" name="senha" id="senha"><br>
 
                 <button type="submit">Atualizar Conta</button>
             </form>
+            <img src="{{ url_for('foto_perfil', cpf=usuario.cpf) }}" alt="Foto de perfil" style="width: 100px; height: 100px;">
+
         </div>
     </article>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.location.search.includes('atualizada=true')) {
+                alert('Conta atualizada com sucesso!');
+            }
+        });
+
         var menuItem = document.querySelectorAll('.item-menu')
 
         function selectLink(){
@@ -80,7 +88,7 @@
             item.addEventListener('click', selectLink)
         )
 
-        //Expandir o menu
+        // Expandir o menu
         var expandir = document.querySelector('#expandir')
         var menu_expandido = document.querySelector('.menu-burguer')
 
