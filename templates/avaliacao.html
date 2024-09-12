@@ -6,7 +6,6 @@
     <title>CIC GYM</title>
     <link rel="stylesheet" href="../static/css/avaliacao.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
 </head>
 <body>
     <header>
@@ -14,9 +13,8 @@
             <div class="expansor">
                 <i class="bi bi-list" id="expandir"></i>
             </div>
-
             <ul>
-                <li class="item-menu ativo">
+                <li class="item-menu">
                     <a href="/homepage">
                         <span class="icone"><i class="bi bi-house-door"></i></span>
                         <span class="txt">Home</span>
@@ -28,13 +26,12 @@
                         <span class="txt">Treino</span>
                     </a>
                 </li>
-                <li class="item-menu">
+                <li class="item-menu ativo">
                     <a href="/avaliacao">
                         <span class="icone"><i class="bi bi-calendar3"></i></span>
                         <span class="txt">Avaliação</span>
                     </a>
                 </li>
-                
                 <li class="item-menu">
                     <a href="/conta">
                         <span class="icone"><i class="bi bi-person-circle"></i></span>
@@ -51,15 +48,29 @@
             <img src="../static/assets/logo_cic_gym_blue.png" alt="logo">
             <h1>Avaliação</h1>
         </div>
-        <form>
-            Peso<input type="text" name="peso" id="peso">
-            Altura<input type="text" name="altura" id="altura">
-            IMC<input type="text" name="imc" id="">
-            Data Avaliação<input type="date" name="data-avaliacao" id="data-avaliacao">
+        <form action="/avaliacao" method="POST">
+            Peso: <input type="text" name="peso" id="peso" oninput="calcularIMC()">
+            Altura: <input type="text" name="altura" id="altura" oninput="calcularIMC()">
+            IMC: <input type="text" name="imc" id="imc" readonly>
+            Data Avaliação: <input type="date" name="data-avaliacao" id="data-avaliacao">
+            <input type="submit" value="Enviar Avaliação">
         </form>
+        
     </article>
 
     <script>
+        function calcularIMC() {
+            var peso = parseFloat(document.getElementById('peso').value);
+            var altura = parseFloat(document.getElementById('altura').value);
+
+            if (peso > 0 && altura > 0) {
+                var imc = peso / (altura * altura);
+                document.getElementById('imc').value = imc.toFixed(2);
+            } else {
+                document.getElementById('imc').value = '';
+            }
+        }
+
         var menuItem = document.querySelectorAll('.item-menu')
 
         function selectLink(){

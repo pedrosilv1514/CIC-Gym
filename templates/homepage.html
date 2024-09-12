@@ -48,6 +48,20 @@
             object-fit: cover;
             border: 2px solid #ddd;
         }
+
+        .resultado-abaixo-do-peso {
+            color: blue;
+        }
+        .resultado-peso-normal {
+            color: green;
+        }
+        .resultado-sobrepeso {
+            color: orange;
+        }
+        .resultado-obesidade {
+            color: red;
+        }
+
     </style>
 </head>
 <body>
@@ -88,8 +102,8 @@
 
     <article class="conteudo">
         <div class="responsivo">
-            <img src="/frontend/assets/logo_cic_gym_blue.png" alt="logo">
-            <h1>Bem-vindo {{nome}}</h1>
+            <img src="../static/assets/logo_cic_gym_blue.png" alt="logo">
+            <h1>Bem-vindo: {{ usuario['nome'] }}</h1>
             <div class="imagem-usuario">
                 <!--<span class="icone"><i class="bi bi-person-fill"></i></span>-->
                 <img src="{{ url_for('foto_perfil', cpf=usuario.cpf) }}" alt="Foto de perfil" style="width: 100px; height: 100px;">
@@ -102,8 +116,26 @@
                 </div>
                 <h3>Minhas Avaliações</h3>
                 <div class="avaliacao">
-                    <p>IMC: <strong>18.5</strong></p>
-                    <p>Resultado: <strong>BOM</strong></p>
+                    {% for avaliacao in avaliacoes %}
+                        <p>Data: <strong>{{ avaliacao.data_avaliacao }}</strong></p>
+                        <p>Peso: <strong>{{ avaliacao.peso }} kg</strong></p>
+                        <p>Altura: <strong>{{ avaliacao.altura }} m</strong></p>
+                        <p>IMC: <strong>{{ avaliacao.imc }}</strong></p>
+                        <p>Resultado: 
+                        <strong id="resultado">
+                            {% if avaliacao.imc < 18.5 %}
+                                <span class="resultado-abaixo-do-peso">Abaixo do Peso</span>
+                            {% elif 18.5 <= avaliacao.imc < 24.9 %}
+                                <span class="resultado-peso-normal">Peso Normal</span>
+                            {% elif 25 <= avaliacao.imc < 29.9 %}
+                                <span class="resultado-sobrepeso">Sobrepeso</span>
+                            {% else %}
+                                <span class="resultado-obesidade">Obesidade</span>
+                            {% endif %}
+                        </strong>
+                        </p>
+                        <hr>
+                    {% endfor %}
                 </div>
             </section>
         </div>

@@ -130,9 +130,7 @@ def login():
             print(e)
             return jsonify({'message': 'Erro no login'}), 500
 
-
-# Rota para a homepage, acessível apenas se o usuário estiver logado
-@app.route('/homepage')
+@app.route('/homepage', methods=['GET'])
 def homepage():
     if 'cpf' not in session:
         return redirect(url_for('login'))  # Redirecionar se não estiver autenticado
@@ -150,7 +148,44 @@ def homepage():
     if usuario is None:
         return redirect(url_for('login'))  # Redirecionar se não encontrar o usuário
 
-    return render_template('homepage.html', usuario=usuario)
+    # Buscar avaliações do usuário
+    cur = mysql.connection.cursor()
+    cur.execute("""
+        SELECT * FROM avaliacoes_fisicas
+        WHERE usuario_cpf = %s
+    """, (cpf,))
+    avaliacoes = cur.fetchall()
+    cur.close()
+
+    return render_template('homepage.html', usuario=usuario, avaliacoes=avaliacoes)
+
+
+@app.route('/avaliacao', methods=['GET', 'POST'])
+def avaliacao():
+    if request.method == 'POST':
+        peso = request.form.get('peso')
+        altura = request.form.get('altura')
+        data_avaliacao = request.form.get('data-avaliacao')
+
+        # Calcular IMC
+        if peso and altura:
+            peso = float(peso)
+            altura = float(altura)
+            imc = peso / (altura * altura)
+
+            # Inserir na base de dados
+            cur = mysql.connection.cursor()
+            cur.execute("""
+                INSERT INTO avaliacoes_fisicas (usuario_cpf, imc, altura, peso, data_avaliacao)
+                VALUES (%s, %s, %s, %s, %s)
+            """, (session['cpf'], imc, altura, peso, data_avaliacao))
+            mysql.connection.commit()
+            cur.close()
+
+        return redirect(url_for('homepage'))
+    else:
+        return render_template('avaliacao.html')
+
 
 # Rota para carregar a página de treino
 @app.route('/treino')
@@ -191,13 +226,6 @@ def get_exercicios_diversos():
     exercicios = cur.fetchall()
     cur.close()
     return jsonify(exercicios)
-
-
-
-#Rota para a página de avaliação
-@app.route('/avaliacao')
-def avaliacao():
-    return render_template('avaliacao.html')
 
 # Para o professor adicionar os treinos
 
@@ -389,7 +417,6 @@ def atualizar_conta():
     cur.close()
 
     return redirect(url_for('homepage'))
-
 
 @app.route('/api/usuario/<cpf>/foto', methods=['GET'])
 def get_foto_perfil(cpf):
