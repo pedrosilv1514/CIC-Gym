@@ -101,14 +101,13 @@ def login():
             # Verifica se o email pertence a um professor
             cur.execute("SELECT * FROM professores WHERE email = %s", [email])
             professor = cur.fetchone()
-
+            
             if professor:
-                # Se o email pertence a um professor, verifica a senha
-                if professor['senha'] == senha:  # Comparação direta de senha
-                    # Salva o nome do professor na sessão
+                if professor['senha'] == senha:
                     session['user'] = professor['nome']
                     session['email'] = professor['email']
-                    return render_template('professor.html', nome=professor['nome'])  # Redireciona para a página do professor
+                    session['professor_id'] = professor['id']  # Salve o professor_id na sessão
+                    return render_template('professor.html', nome=professor['nome'])
                 else:
                     return jsonify({'message': 'Credenciais inválidas'}), 401
 
