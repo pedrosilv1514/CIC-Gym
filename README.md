@@ -29,14 +29,20 @@
 -------------
 
 <h2>Modelo Entidade Relacionamento</h2>
-<img alt="modelo-entidade-relacionamento" src="static/assets/Modelo Entidade Relacionamento.png">
+<img alt="modelo-entidade-relacionamento" src="static/assets/Modelo Entidade Relacionamento new.png">
 
 ------------
 
 <h2>Modelo Relacional</h2>
-<img alt="modelo-entidade-relacionamento" src="static/assets/modelo_relacional.png">
+<img alt="modelo-entidade-relacionamento" src="static/assets/Modelo Relacional.png">
 
 ------------
+
+<h2>Camada de Mapeamento</h2>
+<img alt="camada-mapeamento" src="static/assets/Camada de Mapeamento.png">
+
+------------
+
 
 <h2>💻 Autores</h2>
 
